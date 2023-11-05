@@ -1,7 +1,11 @@
 export {default as About} from './PlayGround';
 export {default as Agreement} from './PlayGround';
 export {default as Articles} from './Articles';
-export {default as Chat} from './PlayGround';
+export {default as Notes} from './Notes';
+export {default as Videos} from './Videos';
+export {default as Videos_Notes} from './Video_Notes';
+export {default as Exam} from './Exam';
+export {default as Timer} from '../dummy-components/TimerComponent';
 export {default as Components} from './Components';
 export {default as Extras} from './PlayGround';
 export {default as Home} from './Home';

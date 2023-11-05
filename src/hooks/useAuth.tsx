@@ -83,3 +83,40 @@ export function useAuth() {
   }
   return context;
 }
+
+
+// ----------------------------Sample Use -----------------------------------------
+
+// import { useAuth } from './path-to-this-file'; // Update this path accordingly
+
+// const MyComponent = () => {
+//   const { auth, setAuth } = useAuth();
+
+//   const handleLogin = async () => {
+//     try {
+//       // Dummy data: Replace this with actual data from a login API call or user input
+//       const newAuthData = {
+//         phone: '123-456-7890',
+//         token: 'sample-token-123456',
+//       };
+
+//       await setAuth(newAuthData);
+//       console.log("Logged in successfully!");
+//     } catch (error) {
+//       console.error("Error logging in:", error);
+//     }
+//   };
+
+//   return (
+//     < >   
+//         <Text>Current Phone: {auth.phone}</Text>
+//         {/* Note: Displaying a token in the UI is usually not recommended due to security concerns */}
+//         <Text>Current Token: {auth.token}</Text>
+//       <Button title="Login with Dummy Data" onPress={handleLogin} />
+//     </>
+//   );
+// };
+
+
+// export default MyComponent;
+

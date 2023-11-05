@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from 'react-native';
 // import {BlurView} from 'expo-blur';
-import { BlurView } from "@react-native-community/blur";
+import {BlurView} from '@react-native-community/blur';
 import LinearGradient from 'react-native-linear-gradient';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
@@ -72,6 +72,7 @@ const Block = (props: IBlockProps) => {
     bottom,
     end,
     start,
+    z,
     ...rest
   } = props;
   const {colors, sizes} = useTheme();
@@ -165,6 +166,7 @@ const Block = (props: IBlockProps) => {
       ...(left !== undefined && {left}),
       ...(top !== undefined && {top}),
       ...(bottom !== undefined && {bottom}),
+      ...(z !== undefined && {zIndex: z}),
     },
   ]) as ViewStyle;
 
@@ -202,25 +204,24 @@ const Block = (props: IBlockProps) => {
         {...blockID}
         colors={gradient}
         style={blockStyles}
-        start={{x: 1, y: 0}} end={{x: 0.0, y: 0.0}}
+        start={{x: 1, y: 0}}
+        end={{x: 0.0, y: 0.0}}
         {...rest}>
         {children}
       </LinearGradient>
     );
   }
- 
+
   if (blur) {
     return (
       <BlurView
         {...blockID}
         overlayColor={tint}
         blurType={tint}
-        blurAmount={intensity}
-       >
-         <View {...blockID} {...rest} style={blockStyles}>
-         {children}
-         </View>
-        
+        blurAmount={intensity}>
+        <View {...blockID} {...rest} style={blockStyles}>
+          {children}
+        </View>
       </BlurView>
     );
   }

@@ -9,6 +9,11 @@ import {
   Register,
   Pro,
   PlayGround,
+  Notes,
+  Videos,
+  Videos_Notes,
+  Exam,
+  Timer,
 } from '../screens';
 import {useScreenOptions, useTranslation, useAuth} from '../hooks';
 
@@ -42,6 +47,33 @@ export default () => {
             options={{title: t('navigation.articles')}}
           />
 
+          <Stack.Screen
+            name="Notes"
+            component={Notes}
+            options={{title: t('navigation.articles')}}
+          />
+
+          <Stack.Screen
+            name="Videos"
+            component={Videos}
+            options={{title: t('navigation.articles')}}
+          />
+
+          <Stack.Screen
+            name="Videos_Notes"
+            component={Videos_Notes}
+            options={{title: t('navigation.articles')}}
+          />
+          <Stack.Screen
+            name="Timer"
+            component={Timer}
+            options={{title: t('navigation.articles')}}
+          />
+          <Stack.Screen
+            name="Exam"
+            component={Exam}
+            options={{title: t('navigation.articles')}}
+          />
           <Stack.Screen
             name="Pro"
             component={Pro}

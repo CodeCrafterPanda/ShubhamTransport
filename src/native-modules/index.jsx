@@ -1,0 +1,1 @@
+export {addAutoRotationChangeListener} from './AutoRotationModule'

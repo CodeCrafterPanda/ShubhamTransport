@@ -1,0 +1,1 @@
+export {minorVersionCompare} from './common';

@@ -13,5 +13,5 @@ AppRegistry.registerComponent(appName, () => App);
 //     AppRegistry.runApplication(appName, { rootTag });
 // }
 
-// git remote add ShubhamTransport https://github.com/CodeCrafterPanda/ShubhamTransport.git
+
 

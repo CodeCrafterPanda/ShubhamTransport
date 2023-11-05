@@ -235,6 +235,11 @@ export interface IBlockProps
    * @see https://docs.expo.io/versions/latest/sdk/linear-gradient/#props
    */
   end?: any;
+  /**
+   * Renders Z-Index
+   * @see https://docs.expo.io/versions/latest/sdk/linear-gradient/#props
+   */
+  z?:any;
 }
 
 /**

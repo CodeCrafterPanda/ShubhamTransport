@@ -6,4 +6,10 @@ export {
   TranslationProvider,
   useTranslation,
 } from './useTranslation';
-export {AuthContext,AuthProvider,useAuth} from './useAuth'
+export {AuthContext, AuthProvider, useAuth} from './useAuth';
+export {
+  DeviceInfoProvider,
+  DeviceInfoContext,
+  useDeviceInfo,
+} from './useDeviceInfo';
+export {OrientationProvider,OrientationContext,useOrientation} from './useOrientation'
