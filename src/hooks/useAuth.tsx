@@ -85,6 +85,45 @@ export function useAuth() {
 }
 
 
+// import React, { useState, useEffect } from 'react';
+// import { View, Text } from 'react-native';
+// import auth from '@react-native-firebase/auth';
+
+// function App() {
+//   // Set an initializing state whilst Firebase connects
+//   const [initializing, setInitializing] = useState(true);
+//   const [user, setUser] = useState();
+
+//   // Handle user state changes
+//   function onAuthStateChanged(user) {
+//     setUser(user);
+//     if (initializing) setInitializing(false);
+//   }
+
+//   useEffect(() => {
+//     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+//     return subscriber; // unsubscribe on unmount
+//   }, []);
+
+//   if (initializing) return null;
+
+//   if (!user) {
+//     return (
+//       <View>
+//         <Text>Login</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <View>
+//       <Text>Welcome {user.email}</Text>
+//     </View>
+//   );
+// }
+
+
+
 // ----------------------------Sample Use -----------------------------------------
 
 // import { useAuth } from './path-to-this-file'; // Update this path accordingly
@@ -120,3 +159,108 @@ export function useAuth() {
 
 // export default MyComponent;
 
+
+
+// npm install --save @react-native-firebase/app  @react-native-firebase/auth @react-native-firebase/firestore
+
+
+
+// Entities:
+// Truck
+
+// TruckID (Primary Key)
+// LicensePlate
+// Model
+// Capacity
+// Status
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
+// Trip
+
+// TripID (Primary Key)
+// TruckID (Foreign Key from Truck)
+// CustomerID (Foreign Key from Customer)
+// Source
+// Destination
+// Date
+// EstimatedDuration
+// ActualDuration
+// Status
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
+// Customer
+
+// CustomerID (Primary Key)
+// Name
+// ContactDetails
+// Address
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
+// Payment
+
+// PaymentID (Primary Key)
+// TripID (Foreign Key from Trip)
+// Amount
+// PaymentStatus
+// PaymentType
+// Date
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
+// User
+
+// UserID (Primary Key)
+// Username
+// Password
+// Role
+// CreatedAt
+// UpdatedAt
+// TripUser
+
+// TripUserID (Primary Key)
+// TripID (Foreign Key from Trip)
+// UserID (Foreign Key from User)
+// ActionType
+// ActionDate
+// CreatedAt
+// UpdatedAt
+// Expense
+
+// ExpenseID (Primary Key)
+// TripID (Foreign Key from Trip, Nullable)
+// Amount
+// Date
+// Category
+// Description
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
+// Driver
+
+// DriverID (Primary Key)
+// Name
+// LicenseNumber
+// ContactDetails
+// Salary
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
+// TripDriver
+
+// TripDriverID (Primary Key)
+// TripID (Foreign Key from Trip)
+// DriverID (Foreign Key from Driver)
+// CreatedAt
+// UpdatedAt
+// Savings
+
+// SavingsID (Primary Key)
+// Amount
+// Date
+// Source (e.g., PaymentID if from a trip)
+// CreatedAt
+// UpdatedAt
+// CreatedBy (Foreign Key from User)
