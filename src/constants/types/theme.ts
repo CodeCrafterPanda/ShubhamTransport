@@ -278,6 +278,7 @@ export interface ThemeAssets {
 
   ios: ImageSourcePropType;
   android: ImageSourcePropType;
+  tLogo: ImageSourcePropType;
 }
 
 export interface ThemeFonts {

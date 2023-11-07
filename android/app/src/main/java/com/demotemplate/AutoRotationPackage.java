@@ -1,4 +1,4 @@
-package com.demotemplate; 
+package com.shubham.transportapp; 
 
 import androidx.annotation.NonNull;
 import com.facebook.react.ReactPackage;

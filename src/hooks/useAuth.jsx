@@ -5,65 +5,35 @@ import React, {
   ReactNode,
   useContext,
 } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
 
-interface IAuth {
-  phone: string;
-  token: string;
-}
 
-interface IAuthContextType {
-  auth: IAuth;
-  setAuth: (auth: IAuth) => Promise<void>;
-}
+const AuthContext = createContext();
 
-const AuthContext = createContext<IAuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
 
-const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
-  const initialState: IAuth = {
-    phone: '',
-    token: '',
-  };
+const AuthProvider = ({children}) => {
+    // Set an initializing state whilst Firebase connects
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
 
-  const [auth, setAuthState] = useState<IAuth>(initialState);
-
-  // Get current auth state from AsyncStorage
-  const getAuthState = async () => {
-    try {
-      const authDataString = await AsyncStorage.getItem('auth');
-      const authData: IAuth = JSON.parse(
-        authDataString || JSON.stringify(initialState),
-      );
-      // Configure axios headers or another HTTP requests client
-      configureAxiosHeaders(authData.token, authData.phone);
-      setAuthState(authData);
-    } catch (err) {
-      setAuthState(initialState);
-    }
-  };
-
-  // Update AsyncStorage & context state
-  const setAuth = async (newAuth: IAuth) => {
-    try {
-      await AsyncStorage.setItem('auth', JSON.stringify(newAuth));
-      // Configure axios headers or another HTTP requests client
-      configureAxiosHeaders(newAuth.token, newAuth.phone);
-      setAuthState(newAuth);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    console.log('User:',user)
+    setUser(user);
+    setTimeout(()=>{
+      if (initializing) setInitializing(false);
+    },1000)
+  }
 
   useEffect(() => {
-    getAuthState();
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
   }, []);
 
   return (
-    <AuthContext.Provider value={{auth, setAuth}}>
+    <AuthContext.Provider value={{initializing, user}}>
       {children}
     </AuthContext.Provider>
   );
@@ -71,9 +41,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
 export {AuthContext, AuthProvider};
 
-function configureAxiosHeaders(token: string, phone: string) {
-  // code to set headers in Axios based on the token and phone
-}
 
 // Custom hook to use the AuthContext
 export function useAuth() {
@@ -83,7 +50,6 @@ export function useAuth() {
   }
   return context;
 }
-
 
 // import React, { useState, useEffect } from 'react';
 // import { View, Text } from 'react-native';
@@ -122,8 +88,6 @@ export function useAuth() {
 //   );
 // }
 
-
-
 // ----------------------------Sample Use -----------------------------------------
 
 // import { useAuth } from './path-to-this-file'; // Update this path accordingly
@@ -147,7 +111,7 @@ export function useAuth() {
 //   };
 
 //   return (
-//     < >   
+//     < >
 //         <Text>Current Phone: {auth.phone}</Text>
 //         {/* Note: Displaying a token in the UI is usually not recommended due to security concerns */}
 //         <Text>Current Token: {auth.token}</Text>
@@ -156,14 +120,7 @@ export function useAuth() {
 //   );
 // };
 
-
 // export default MyComponent;
-
-
-
-// npm install --save @react-native-firebase/app  @react-native-firebase/auth @react-native-firebase/firestore
-
-
 
 // Entities:
 // Truck

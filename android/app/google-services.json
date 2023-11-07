@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1012937162368",
+    "project_id": "shubhamtransport-f5662",
+    "storage_bucket": "shubhamtransport-f5662.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1012937162368:android:21947b5d955ed0692c3065",
+        "android_client_info": {
+          "package_name": "com.shubham.transportapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiTxn6ye6b8gy_OZ4aXCYmV0iZPSQPPjs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -10,14 +10,15 @@ import AppNavigation from './src/navigation/App';
 import SystemVersionAlert from './src/utils-cmp/SystemVersionAlert';
 import NetworkAlert from './src/utils-cmp/NetworkAlert';
 import UpdateVersionAlert from './src/utils-cmp/UpdateVersionAlert';
+import SplashScreen from './src/screens/SplashScreen';
 export default function App() {
   return (
     <DeviceInfoProvider>
       <AuthProvider>
         <DataProvider>
           <OrientationProvider>
-            <UpdateVersionAlert/>
-            <SystemVersionAlert defaultVersion="13" />
+            {/* <UpdateVersionAlert/>
+            <SystemVersionAlert defaultVersion="13" /> */}
             <NetworkAlert />
             <AppNavigation />
           </OrientationProvider>

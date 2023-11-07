@@ -23,7 +23,7 @@ export default function ImageWrapper({src, style, width}) {
         setOriginalImageHeight(h);
         setLoadingImageSize(false);
         let tempW = width || screenWidth;
-        let tempH = tempW * (h / w);
+        let tempH = parseInt(tempW * (h / w));
         setFinalImageWidth(tempW);
         setFinalImageHeight(tempH);
       },
@@ -57,8 +57,9 @@ export default function ImageWrapper({src, style, width}) {
               width: finalImageWidth,
               height: finalImageHeight,
               resizeMode: 'contain',
+              // ...(!!style && style ),
             },
-            style,
+            
           ]}
           source={{
             uri: src,

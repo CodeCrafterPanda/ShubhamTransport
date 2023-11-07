@@ -4,12 +4,15 @@ import {Platform, StatusBar} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 // import * as SplashScreen from 'expo-splash-screen';
 import Menu from './Menu';
-import {useData, ThemeProvider, TranslationProvider} from '../hooks';
+import {Register,Login,Splash} from '../screens';
+import {useData, ThemeProvider, TranslationProvider, useAuth} from '../hooks';
+import {createStackNavigator} from '@react-navigation/stack';
 
-// Keep the splash screen visible while we fetch resources
-// SplashScreen.preventAutoHideAsync();
+const Stack = createStackNavigator();
+
 export default () => {
   const {isDark, theme, setTheme} = useData();
+  const {initializing, user} = useAuth();
 
   /* set the status bar based on isDark constant */
   useEffect(() => {
@@ -20,19 +23,7 @@ export default () => {
     };
   }, [isDark]);
 
-  // // load custom fonts
-  // const fontsLoaded = true;
-
-  // // if (fontsLoaded) {
-  // //   const hideSplash = async () => {
-  // //     await SplashScreen.hideAsync();
-  // //   };
-  // //   hideSplash();
-  // // }
-
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
+ 
 
   const navigationTheme = {
     ...DefaultTheme,
@@ -48,17 +39,26 @@ export default () => {
     },
   };
 
+  if (initializing) return <Splash/>;
   return (
     <>
-    <StatusBar translucent backgroundColor='transparent' />
-     <TranslationProvider>
-      <ThemeProvider theme={theme} setTheme={setTheme}>
-        <NavigationContainer theme={navigationTheme}>
-          <Menu />
-        </NavigationContainer>
-      </ThemeProvider>
-    </TranslationProvider>
+      <StatusBar translucent backgroundColor="transparent" />
+      <TranslationProvider>
+        <ThemeProvider theme={theme} setTheme={setTheme}>
+          <NavigationContainer theme={navigationTheme}>
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              {!user ? (
+                <>
+                  <Stack.Screen name="Register" component={Register} />
+                  <Stack.Screen name="Login" component={Login} />
+                </>
+              ) : (
+                <Stack.Screen name="Home" component={Menu} />
+              )}
+            </Stack.Navigator>
+          </NavigationContainer>
+        </ThemeProvider>
+      </TranslationProvider>
     </>
-   
   );
 };

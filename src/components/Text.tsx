@@ -150,7 +150,7 @@ const Typography = (props: ITextProps) => {
       ...(paddingLeft && {paddingLeft}),
       ...(center && {textAlign: 'center'}),
       ...(align && {textAlign: align}),
-      ...(bold && {fontFamily: fonts.bold}),
+      ...(bold && {fontFamily: fonts.bold,fontWeight:'bold'}),
       ...(semibold && {fontFamily: fonts.semibold}),
       ...(weight && {fontWeight: weight}),
       ...(transform && {textTransform: transform}),

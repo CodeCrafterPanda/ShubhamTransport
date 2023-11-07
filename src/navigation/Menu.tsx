@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Alert, Animated, Linking, StyleSheet,View} from 'react-native';
+import {Alert, Animated, Linking, StyleSheet, View} from 'react-native';
 
 import {
   useDrawerStatus,
@@ -11,12 +11,13 @@ import {
 import Screens from './Screens';
 import {Block, Text, Switch, Button, Image} from '../components';
 import {useData, useTheme, useTranslation} from '../hooks';
+import auth from '@react-native-firebase/auth';
 
 const Drawer = createDrawerNavigator();
 /* drawer menu screens navigation */
 const ScreensStack = () => {
   const {colors} = useTheme();
-  const isDrawerOpen  = useDrawerStatus() === 'open';
+  const isDrawerOpen = useDrawerStatus() === 'open';
   const animation = useRef(new Animated.Value(0)).current;
 
   const scale = animation.interpolate({
@@ -60,9 +61,7 @@ const ScreensStack = () => {
 };
 
 /* custom drawer menu */
-const DrawerContent = (
-  props: DrawerContentComponentProps<any>,
-) => {
+const DrawerContent = (props: DrawerContentComponentProps<any>) => {
   const {navigation} = props;
   const {t} = useTranslation();
   const {isDark, handleIsDark} = useData();
@@ -71,29 +70,28 @@ const DrawerContent = (
   const labelColor = colors.text;
 
   const handleNavigation = useCallback(
-    (to) => {
+    to => {
       setActive(to);
       navigation.navigate(to);
     },
     [navigation, setActive],
   );
 
-  const handleWebLink = useCallback((url) => Linking.openURL(url), []);
+  const handleWebLink = useCallback(url => Linking.openURL(url), []);
 
-  const isDrawerOpen  = useDrawerStatus() === 'open';
- 
+  const isDrawerOpen = useDrawerStatus() === 'open';
+
   // screen list for Drawer menu
   const screens = [
     {name: t('screens.home'), to: 'Home', icon: assets.home},
-    {name: t('screens.timer'), to: 'Timer', icon: assets.components},
-    {name: t('screens.notes'), to: 'Notes', icon: assets.document},
-    {name: t('screens.videos'), to: 'Videos', icon: assets.profile},
-    {name: t('screens.notes'), to: 'Notes', icon: assets.rental},
-    {name: t('screens.notes_videos'), to: 'Videos_Notes', icon: assets.profile},
-    // {name: t('screens.settings'), to: 'Pro', icon: assets.settings},
-    {name: t('screens.exam'), to: 'Exam', icon: assets.register},
-    {name: t('screens.register'), to: 'Register', icon: assets.register},
-
+    {name: t('screens.users'), to: 'Users', icon: assets.components},
+    {name: t('screens.trucks'), to: 'Trucks', icon: assets.document},
+    {name: t('screens.trips'), to: 'Trips', icon: assets.profile},
+    {name: t('screens.payments'), to: 'Payments', icon: assets.rental},
+    {name: t('screens.expenses'), to: 'Expenses', icon: assets.profile},
+    {name: t('screens.savings'), to: 'Savings', icon: assets.settings},
+    {name: t('screens.drivers'), to: 'Drivers', icon: assets.register},
+    {name: t('screens.customers'), to: 'Customers', icon: assets.register},
     // {name: t('screens.extra'), to: 'Pro', icon: assets.extras},
   ];
 
@@ -165,18 +163,15 @@ const DrawerContent = (
           gradient={gradients.menu}
         />
 
-        <Text semibold transform="uppercase" opacity={0.5}>
-          {t('menu.documentation')}
-        </Text>
-
+     
         <Button
           row
           justify="flex-start"
           marginTop={sizes.sm}
           marginBottom={sizes.s}
-          onPress={() =>
-            handleWebLink('https://github.com/CodeCrafterPanda')
-          }>
+          onPress={() => auth()
+            .signOut()
+            .then(() => console.log('User signed out!'))}>
           <Block
             flex={0}
             radius={6}
@@ -195,20 +190,11 @@ const DrawerContent = (
             />
           </Block>
           <Text p color={labelColor}>
-            {t('menu.started')}
+             Logout
           </Text>
         </Button>
 
-        <Block row justify="space-between" marginTop={sizes.sm}>
-          <Text color={labelColor}>{t('darkMode')}</Text>
-          <Switch
-            checked={isDark}
-            onPress={(checked) => {
-              handleIsDark(checked);
-              Alert.alert(t('pro.title'), t('pro.alert'));
-            }}
-          />
-        </Block>
+       
       </Block>
     </DrawerContentScrollView>
   );
@@ -217,23 +203,26 @@ const DrawerContent = (
 /* drawer menu navigation */
 export default () => {
   const {gradients} = useTheme();
-  
+
   return (
     <Block gradient={gradients.light}>
       <Drawer.Navigator
-        drawerContent={(props) => <DrawerContent {...props} />}
+        drawerContent={props => <DrawerContent {...props} />}
         screenOptions={{
-          drawerType:"slide",
-          drawerStyle:{
+          drawerType: 'slide',
+          drawerStyle: {
             flex: 1,
             width: '60%',
             borderRightWidth: 0,
             backgroundColor: 'transparent',
           },
           overlayColor: 'transparent',
-        }}
-        >
-        <Drawer.Screen name="Screens" component={ScreensStack}  options={{headerShown: false}} />
+        }}>
+        <Drawer.Screen
+          name="Screens"
+          component={ScreensStack}
+          options={{headerShown: false}}
+        />
       </Drawer.Navigator>
     </Block>
   );

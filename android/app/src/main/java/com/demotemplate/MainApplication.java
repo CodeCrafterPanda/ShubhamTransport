@@ -1,4 +1,4 @@
-package com.demotemplate;
+package com.shubham.transportapp;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
