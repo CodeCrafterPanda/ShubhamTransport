@@ -1,38 +1,16 @@
-import React, {useState, useCallback, memo} from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {Dropdown} from 'react-native-element-dropdown';
-
-import {Input, Modal} from '../../components';
-
-import {useTheme} from '../../hooks';
-import {
-  customerData,
-  expenseData,
-  paymentModeData,
-  paymentProviderData,
-  getSummary,
-  modifiedTransactions,
-  getCurrentTimeAndDate,
-} from '../constants';
-import {styles} from './index.styles';
+import React, {useCallback, useState} from 'react';
+import {ScrollView, View} from 'react-native';
+import {getSummary, modifiedTransactions} from '../constants';
 import BalanceSummary from './BalanceSummary';
-import TransactionButton from './TransactionButton';
 import CashInOutModal from './CashInOutModal';
 import Transaction from './Transaction';
-
+import TransactionButton from './TransactionButton';
+import {styles} from './index.styles';
 
 const App = () => {
   const [allTransactions, setAllTransactions] = useState(modifiedTransactions);
   const [showModal, setModal] = useState(false);
-  const [modalData, setModalData] = useState({
-    type: 'Cash In',
-  });
+  const [modalType, setModalType] = useState('Cash In');
 
   const handleCashIn = useCallback(transactionData => {
     setAllTransactions(prev => [transactionData, ...prev]);
@@ -62,7 +40,7 @@ const App = () => {
         <TransactionButton
           title="+ CASH IN"
           onPress={() => {
-            setModalData({type: 'Cash In', data: customerData});
+            setModalType('Cash In');
             setModal(true);
           }}
           style={styles.cashInButton}
@@ -70,7 +48,7 @@ const App = () => {
         <TransactionButton
           title="- CASH OUT"
           onPress={() => {
-            setModalData({type: 'Cash Out', data: expenseData});
+            setModalType('Cash Out');
             setModal(true);
           }}
           style={styles.cashOutButton}
@@ -78,13 +56,11 @@ const App = () => {
       </View>
       {showModal && (
         <CashInOutModal
-          type={modalData.type}
+          type={modalType}
           onChange={setAllTransactions}
           showModal={showModal}
           setModal={setModal}
-          handleSave={
-            modalData.type === 'Cash In' ? handleCashIn : handleCashOut
-          }
+          handleSave={modalType === 'Cash In' ? handleCashIn : handleCashOut}
         />
       )}
     </View>
