@@ -1,14 +1,14 @@
 export {default as Customers} from './Customers';
 export {default as Users} from './Users';
 export {default as Trucks} from './Trucks';
-export {default as Trips} from './Trips';
+export {default as Trips} from './TripsCopy';
 export {default as Payments} from './Payments';
 export {default as Expenses} from './Expenses';
 export {default as Savings} from './Savings';
 export {default as Drivers} from './Drivers';
 export {default as Components} from './Components';
 export {default as Extras} from './PlayGround';
-export {default as Home} from './Home';
+export {default as Home} from './Transactions';
 // export {default as Notifications} from './PlayGround';
 // export {default as NotificationsSettings} from './PlayGround';
 // export {default as Privacy} from './PlayGround';

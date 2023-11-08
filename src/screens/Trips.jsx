@@ -1,248 +1,517 @@
-import React from 'react';
+import React, {useState, useCallback, memo} from 'react';
 import {
-  View,
+  ScrollView,
   StyleSheet,
-  FlatList,
+  Text,
   TouchableOpacity,
-  SafeAreaView,
+  View,
 } from 'react-native';
-
-import {useData, useTheme, useTranslation} from '../hooks/';
-import {Block, Button, Image, Input, Product, Text} from '../components/';
-
-const trips = [
-  {
-    id: '123',
-    truckModel: 'Freightliner CAS ACADIA',
-    tripNumber: 'TN 07 2 9898',
-    price: '2000',
-    origin: 'Philadelphia, PA',
-    destination: 'San Antonio, TX',
-    dates: '25 Aug - 8:00 AM to 28 Aug - 12:00 AM',
-    imageUrl: 'https://your-image-url.com/truck1.png',
-    completed: true,
-  },
-  {
-    id: '1234',
-    truckModel: 'Freightliner CAS ACADIA',
-    tripNumber: 'TN 33 5 3533',
-    price: '1400',
-    origin: 'Charlotte, CH',
-    destination: 'Boston, BO',
-    dates: '25 Jan - 8:00 AM to 28 Jan - 12:00 AM',
-    imageUrl: 'https://your-image-url.com/truck2.png',
-    completed: false,
-  },
-  // ... other trips
-];
-
-const EditButton = ({onPress}) => (
-  <TouchableOpacity onPress={onPress} style={styles.editButton}>
-    <Text style={styles.editButtonText}>Edit</Text>
-  </TouchableOpacity>
-);
-
-const FloatingActionButton = ({onPress}) => (
-  <TouchableOpacity onPress={onPress} style={styles.fab}>
-    <Text style={styles.fabIcon}>+</Text>
-  </TouchableOpacity>
-);
-const TripItem = ({item}) => {
-  const {assets, colors, fonts, gradients, sizes} = useTheme();
-  return (
-    <Block card margin={10}>
-      <Block
-        flex={1}
-        row
-        align="center"
-        justify="space-between"
-        marginBottom={5}>
-        <Text h4 size={18}>
-          {item.tripNumber}
-        </Text>
-        <Text p color={colors.info}>
-          {item.truckModel}
-        </Text>
-      </Block>
-      <Block
-        flex={1}
-        row
-        align="center"
-        justify="space-between"
-        marginBottom={15}>
-        <Text p color={colors.warning}>
-          {item.origin}
-        </Text>
-        <Text p color={colors.warning}>
-          {item.destination}
-        </Text>
-      </Block>
-
-      <Block
-        flex={1}
-        row
-        align="center"
-        justify="space-between"
-        marginBottom={5}>
-        <Text h5 color={colors.info} bold>
-          ₹{item.price}
-        </Text>
-        {item.completed ? (
-          <Text h5 color={colors.success}>
-            Complete
-          </Text>
-        ) : (
-          <>
-            <Text h5 color={colors.danger}>
-              <Text h5 color={colors.warning}>
-                ₹{+item.price - 200}
-              </Text>
-            </Text>
-            <Text h5 color={colors.danger}>
-              Partial
-            </Text>
-          </>
-        )}
-      </Block>
-      {!item.completed && (
-        <Block
-          flex={1}
-          row
-          align="center"
-          justify="space-between"
-          marginBottom={5}
-          marginTop={10}>
-          <TouchableOpacity>
-            <Block row flex={0} align="center">
-              <Text
-                p
-                color={colors.success}
-                semibold
-                size={sizes.s * 2}
-                marginRight={sizes.s}>
-                Payment
-              </Text>
-            </Block>
-          </TouchableOpacity>
-
-          <TouchableOpacity>
-            <Block row flex={0} align="center">
-              <Text
-                p
-                color={colors.danger}
-                semibold
-                size={sizes.s * 2}
-                marginRight={sizes.s}>
-                Expense
-              </Text>
-            </Block>
-          </TouchableOpacity>
-        </Block>
-      )}
-    </Block>
-  );
-};
-
-const App = () => (
-  <SafeAreaView style={styles.container}>
-    <FlatList
-      data={trips}
-      keyExtractor={item => item.id}
-      renderItem={({item}) => <TripItem item={item} />}
-    />
-    <FloatingActionButton onPress={() => console.log('Create Trip pressed')} />
-  </SafeAreaView>
-);
+import {Dropdown} from 'react-native-element-dropdown';
+import Input from '../components/Input';
+import Modal from '../components/Modal';
+import {useTheme} from '../hooks';
+import {
+  customerData,
+  expenseData,
+  paymentModeData,
+  paymentProviderData,
+  getSummary,
+  modifiedTransactions,
+  getCurrentTimeAndDate,
+} from './constants';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  header: {
     backgroundColor: '#fff',
-  },
-  tripItem: {
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#fff', // Ensure the background color is set for shadow to appear
-    borderRadius: 5, // Optional: if you want rounded corners
-    margin: 10, // This adds margin around each trip item
-    marginBottom: 15, // This adds additional bottom margin
-    // Shadow for iOS
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    // Elevation for Android
-    elevation: 3,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-  },
-  infoContainer: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  truckModel: {
-    fontWeight: 'bold',
-  },
-  tripNumber: {
-    color: 'gray',
-  },
-  price: {
-    fontSize: 18,
-    color: 'green',
-  },
-  locationContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
   },
-  location: {
-    fontSize: 16,
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  dates: {
-    fontSize: 16,
-    color: 'gray',
+  transactionContainer: {
+    backgroundColor: '#fff',
+    padding: 16,
+    margin: 10,
+    elevation: 5,
   },
-  readMoreButton: {
-    marginTop: 10,
-    alignSelf: 'flex-start',
-    backgroundColor: 'blue',
-    padding: 10,
+  transactionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
   },
-  readMoreButtonText: {
-    color: 'white',
+  transactionTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
-  editButton: {
-    marginTop: 10,
-    backgroundColor: 'orange',
-    padding: 8,
+  transactionAmount: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  transactionDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  transactionDetail: {
+    fontSize: 12,
+    color: '#757575',
+    marginVertical: 5,
+  },
+  transactionType: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#007bff',
+    backgroundColor: '#e7f0fd',
+    paddingHorizontal: 8,
+    paddingVertical: 5,
     borderRadius: 4,
   },
-  editButtonText: {
+  transactionSubDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  entryByLabel: {
+    fontSize: 12,
+    color: '#757575',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginVertical: 8,
+  },
+  summaryContainer: {
+    backgroundColor: '#fff',
+    padding: 16,
+    margin: 10,
+    elevation: 5,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  summaryValue: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  totalIn: {
+    color: '#4CAF50',
+  },
+  totalOut: {
+    color: '#F44336',
+  },
+  viewReportsButton: {
+    backgroundColor: 'transparent',
+    padding: 10,
+    alignItems: 'center',
+  },
+  viewReportsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#007bff',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    backgroundColor: '#fff',
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 5,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  cashInButton: {
+    backgroundColor: '#4CAF50',
+  },
+  cashOutButton: {
+    backgroundColor: '#F44336',
+  },
+  buttonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
     fontSize: 14,
   },
-  fab: {
-    position: 'absolute',
-    width: 56,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    right: 20,
-    bottom: 20,
-    backgroundColor: 'blue',
-    borderRadius: 28,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+  placeholderStyle: {
+    fontSize: 16,
   },
-  fabIcon: {
-    fontSize: 24,
-    color: 'white',
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });
+
+const TransactionEntry = memo(
+  ({
+    title,
+    amount,
+    balance,
+    time,
+    type,
+    paymentMode,
+    paymentProvider,
+    date,
+    comment,
+  }) => {
+    return (
+      <View style={styles.transactionContainer}>
+        <View style={styles.transactionHeader}>
+          <Text style={styles.transactionTitle}>{title}</Text>
+          <Text
+            style={[
+              styles.transactionAmount,
+              type === 'CashIn' ? styles.totalIn : styles.totalOut,
+            ]}>
+            ₹ {amount}
+          </Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.transactionDetails}>
+          <Text style={[styles.transactionDetail]}>{date}</Text>
+          <Text
+            style={[
+              styles.transactionDetail,
+              {color: '#007bff'},
+              balance < 0 && styles.totalOut,
+            ]}>
+            Balance: ₹ {balance}
+          </Text>
+        </View>
+        <View style={styles.transactionDetails}>
+          <Text style={styles.transactionType}>{paymentMode}</Text>
+          {!!paymentProvider && (
+            <Text style={styles.transactionType}>{paymentProvider}</Text>
+          )}
+        </View>
+        <Text style={styles.transactionDetail}>{comment}</Text>
+        <View style={styles.divider} />
+        <View style={styles.transactionSubDetails}>
+          <Text style={styles.entryByLabel}>
+            Entry by :{' '}
+            <Text style={{color: '#007bff', fontWeight: 'bold'}}>You</Text>
+          </Text>
+          <Text style={[styles.entryByLabel, {fontWeight: 'bold'}]}>
+            {time}
+          </Text>
+        </View>
+      </View>
+    );
+  },
+);
+
+const BalanceSummary = memo(({netBalance, totalIn, totalOut}) => {
+  return (
+    <View style={styles.summaryContainer}>
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Net Balance</Text>
+        <Text style={[styles.summaryValue, {color: '#007bff'}]}>
+          ₹ {netBalance}
+        </Text>
+      </View>
+      <View style={styles.divider} />
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Total In (+)</Text>
+        <Text style={[styles.summaryValue, styles.totalIn]}>₹ {totalIn}</Text>
+      </View>
+
+      <View style={styles.summaryRow}>
+        <Text style={styles.summaryLabel}>Total Out (-)</Text>
+        <Text style={[styles.summaryValue, styles.totalOut]}>₹ {totalOut}</Text>
+      </View>
+      {/* <View style={styles.divider} />
+    <TouchableOpacity
+      style={[styles.viewReportsButton, {alignItems: 'center'}]}>
+      <Text style={styles.viewReportsText}>VIEW REPORTS </Text>
+    </TouchableOpacity> */}
+    </View>
+  );
+});
+
+const Button = memo(({title, onPress, style}) => (
+  <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+    <Text style={styles.buttonText}>{title}</Text>
+  </TouchableOpacity>
+));
+
+const DropdownContent = memo(
+  ({
+    data,
+    value,
+    setValue,
+    style,
+    placeholder = '',
+    searchPlaceholder = '',
+  }) => {
+    const [isFocus, setIsFocus] = useState(false);
+    const DropdownChangeHandler = (value, setter) => {
+      setter(value);
+      setIsFocus(false);
+    };
+
+    return (
+      <Dropdown
+        style={[styles.dropdown, isFocus && {borderColor: 'blue'}, style]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={data}
+        search={!!searchPlaceholder}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={!isFocus ? placeholder : '...'}
+        searchPlaceholder={searchPlaceholder}
+        value={value}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={item => DropdownChangeHandler(item.value, setValue)}
+      />
+    );
+  },
+);
+
+const ModalContent = ({type, onChange, showModal, setModal, handleSave}) => {
+  const [amount, setAmount] = useState('');
+  const [customer, setCustomer] = useState(null);
+  const [expense, setExpense] = useState(null);
+  const [paymentMode, setPaymentMode] = useState(null);
+  const [paymentProvider, setPaymentProvider] = useState(null);
+  const [comment, setComment] = useState('');
+
+  const {sizes} = useTheme();
+
+  const onSave = () => {
+    handleSave({
+      amount: +amount,
+      title:
+        type === 'Cash In'
+          ? customerData.find(cst => cst.value === customer).label
+          : expense,
+      paymentMode,
+      paymentProvider,
+      comment,
+      type: type.replace(' ', ''),
+      ...getCurrentTimeAndDate(),
+    });
+    setModal(false); // Close the modal after saving
+  };
+
+  return (
+    <Modal
+      visible={showModal}
+      onRequestClose={() => setModal(false)}
+      title={`Add ${type} Entry`}>
+      <View style={styles.container}>
+        <View style={[styles.summaryContainer, {margin: 0, flex: 1}]}>
+          <Input
+            placeholder="Amount"
+            value={amount}
+            onChangeText={setAmount}
+            marginBottom={sizes.sm}
+          />
+          {type === 'Cash In' && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: sizes.sm,
+              }}>
+              <DropdownContent
+                data={customerData}
+                value={customer}
+                setValue={setCustomer}
+                style={{width: '80%'}}
+                placeholder="Select Customer"
+                searchPlaceholder="Search Customer"
+              />
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.cashInButton,
+                  {
+                    paddingHorizontal: 20,
+                    paddingVertical: 13,
+                    backgroundColor: '#007bff',
+                  },
+                ]}
+                // onPress={() => setShowCustomerModal(true)}
+              >
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {type === 'Cash Out' && (
+            <DropdownContent
+              data={expenseData}
+              value={expense}
+              setValue={setExpense}
+              style={{marginBottom: sizes.sm}}
+              placeholder="Select Expense"
+            />
+          )}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: sizes.sm,
+            }}>
+            <DropdownContent
+              style={[
+                styles.dropdown,
+                {width: paymentMode === 'Online' ? '49%' : '100%'},
+              ]}
+              data={paymentModeData}
+              value={paymentMode}
+              setValue={setPaymentMode}
+              placeholder="Select Payment Mode"
+            />
+            {paymentMode === 'Online' && (
+              <DropdownContent
+                style={[styles.dropdown, {width: '49%'}]}
+                data={paymentProviderData}
+                placeholder="Select Channel"
+                value={paymentProvider}
+                setValue={setPaymentProvider}
+              />
+            )}
+          </View>
+          <Input
+            placeholder="Comment"
+            value={comment}
+            onChangeText={setComment}
+            marginBottom={sizes.sm}
+          />
+        </View>
+        <View style={[styles.buttonContainer, {}]}>
+          <Button title="SAVE" onPress={onSave} style={styles.cashInButton} />
+          <Button
+            title="CANCEL"
+            onPress={() => setModal(false)}
+            style={styles.cashOutButton}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const App = () => {
+  const [allTransactions, setAllTransactions] = useState(modifiedTransactions);
+  const [showModal, setModal] = useState(false);
+  const [modalData, setModalData] = useState({
+    type: 'Cash In',
+  });
+
+  const handleCashIn = useCallback(transactionData => {
+    setAllTransactions(prev => [transactionData, ...prev]);
+    setModal(false);
+  }, []);
+
+  const handleCashOut = useCallback(transactionData => {
+    setAllTransactions(prev => [transactionData, ...prev]);
+    setModal(false);
+  }, []);
+
+  const summary = getSummary(allTransactions);
+
+  return (
+    <View style={styles.container}>
+      <BalanceSummary
+        netBalance={summary.netBalance}
+        totalIn={summary.totalIn}
+        totalOut={summary.totalOut}
+      />
+      <ScrollView>
+        {allTransactions.map((transaction, index) => (
+          <TransactionEntry key={index} {...transaction} />
+        ))}
+      </ScrollView>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="+ CASH IN"
+          onPress={() => {
+            setModalData({type: 'Cash In', data: customerData});
+            setModal(true);
+          }}
+          style={styles.cashInButton}
+        />
+        <Button
+          title="- CASH OUT"
+          onPress={() => {
+            setModalData({type: 'Cash Out', data: expenseData});
+            setModal(true);
+          }}
+          style={styles.cashOutButton}
+        />
+      </View>
+      {showModal && (
+        <ModalContent
+          type={modalData.type}
+          onChange={setAllTransactions}
+          showModal={showModal}
+          setModal={setModal}
+          handleSave={
+            modalData.type === 'Cash In' ? handleCashIn : handleCashOut
+          }
+        />
+      )}
+    </View>
+  );
+};
 
 export default App;
