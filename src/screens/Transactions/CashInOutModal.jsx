@@ -1,41 +1,50 @@
 import React, {useState} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {Input, Modal} from '../../components';
-import {useTheme} from '../../hooks';
+import {useTData, useTheme} from '../../hooks';
 import {
-  customerData,
   expenseData,
   getCurrentTimeAndDate,
   paymentModeData,
   paymentProviderData,
 } from '../constants';
+import CustomerModal from './CustomerModal';
 import DropdownContent from './DropDownContent';
 import TransactionButton from './TransactionButton';
 import {styles} from './index.styles';
 
-const CashInOutModal = ({type, onChange, showModal, setModal, handleSave}) => {
+const CashInOutModal = ({type, showModal, setModal, handleSave}) => {
+  const [showCustomerModal, setCustomerModal] = useState(false);
   const [amount, setAmount] = useState('');
   const [customer, setCustomer] = useState(null);
   const [expense, setExpense] = useState(null);
   const [paymentMode, setPaymentMode] = useState(null);
   const [paymentProvider, setPaymentProvider] = useState(null);
   const [comment, setComment] = useState('');
-
+  const {customers} = useTData();
+  const modifiedCustomersData = customers?.map(cst => ({
+    value: cst.id,
+    label: cst.name,
+  }));
   const {sizes} = useTheme();
 
   const onSave = () => {
-    handleSave({
-      amount: +amount,
-      title:
-        type === 'Cash In'
-          ? customerData.find(cst => cst.value === customer).label
-          : expense,
-      paymentMode,
-      paymentProvider,
-      comment,
-      type: type.replace(' ', ''),
-      ...getCurrentTimeAndDate(),
-    });
+    handleSave(
+      {
+        amount: +amount,
+        title:
+          type === 'Cash In'
+            ? modifiedCustomersData.find(cst => cst.value === customer).label
+            : expense,
+        customer,
+        paymentMode,
+        paymentProvider,
+        comment,
+        type: type.replace(' ', ''),
+        ...getCurrentTimeAndDate(),
+      },
+      type === 'Cash In',
+    );
     setModal(false); // Close the modal after saving
   };
 
@@ -61,7 +70,7 @@ const CashInOutModal = ({type, onChange, showModal, setModal, handleSave}) => {
                 marginBottom: sizes.sm,
               }}>
               <DropdownContent
-                data={customerData}
+                data={modifiedCustomersData}
                 value={customer}
                 setValue={setCustomer}
                 style={{width: '80%'}}
@@ -78,8 +87,7 @@ const CashInOutModal = ({type, onChange, showModal, setModal, handleSave}) => {
                     backgroundColor: '#007bff',
                   },
                 ]}
-                // onPress={() => setShowCustomerModal(true)}
-              >
+                onPress={() => setCustomerModal(true)}>
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
@@ -140,6 +148,10 @@ const CashInOutModal = ({type, onChange, showModal, setModal, handleSave}) => {
             style={styles.cashOutButton}
           />
         </View>
+        <CustomerModal
+          showModal={showCustomerModal}
+          setModal={setCustomerModal}
+        />
       </View>
     </Modal>
   );

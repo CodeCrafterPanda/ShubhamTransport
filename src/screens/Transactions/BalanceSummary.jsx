@@ -1,13 +1,20 @@
 import React, {memo} from 'react';
 import {Text, View} from 'react-native';
 import {styles} from './index.styles';
+import {useTData} from '../../hooks';
 
-const BalanceSummary = memo(({netBalance, totalIn, totalOut}) => {
+const BalanceSummary = memo(() => {
+  const {summary} = useTData();
+  const {netBalance, totalIn, totalOut} = summary;
   return (
     <View style={styles.summaryContainer}>
       <View style={styles.summaryRow}>
         <Text style={styles.summaryLabel}>Net Balance</Text>
-        <Text style={[styles.summaryValue, {color: '#007bff'}]}>
+        <Text
+          style={[
+            styles.summaryValue,
+            parseInt(netBalance) < 0 ? styles.totalOut : {color: '#007bff'},
+          ]}>
           ₹ {netBalance}
         </Text>
       </View>

@@ -4,15 +4,22 @@ import {Platform, StatusBar} from 'react-native';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 // import * as SplashScreen from 'expo-splash-screen';
 import Menu from './Menu';
-import {Register,Login,Splash} from '../screens';
-import {useData, ThemeProvider, TranslationProvider, useAuth} from '../hooks';
+import {Register, Login, Splash, AccessDenied} from '../screens';
+import {
+  useData,
+  ThemeProvider,
+  TranslationProvider,
+  useAuth,
+  TDataProvider,
+  useTData,
+} from '../hooks';
 import {createStackNavigator} from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
 export default () => {
   const {isDark, theme, setTheme} = useData();
-  const {initializing, user} = useAuth();
+  const {initializing, user, dbUser} = useAuth();
 
   /* set the status bar based on isDark constant */
   useEffect(() => {
@@ -22,8 +29,6 @@ export default () => {
       StatusBar.setBarStyle('default');
     };
   }, [isDark]);
-
- 
 
   const navigationTheme = {
     ...DefaultTheme,
@@ -39,7 +44,17 @@ export default () => {
     },
   };
 
-  if (initializing) return <Splash/>;
+  if (initializing) return <Splash />;
+  if (!!dbUser) {
+    if (!dbUser.isActive) {
+      return <AccessDenied />;
+    }
+  }
+  const HomeComponent = () => (
+    <TDataProvider>
+      <Menu />
+    </TDataProvider>
+  );
   return (
     <>
       <StatusBar translucent backgroundColor="transparent" />
@@ -53,7 +68,7 @@ export default () => {
                   <Stack.Screen name="Login" component={Login} />
                 </>
               ) : (
-                <Stack.Screen name="Home" component={Menu} />
+                <Stack.Screen name="Home" component={HomeComponent} />
               )}
             </Stack.Navigator>
           </NavigationContainer>

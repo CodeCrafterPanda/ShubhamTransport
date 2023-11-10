@@ -12,4 +12,10 @@ export {
   DeviceInfoContext,
   useDeviceInfo,
 } from './useDeviceInfo';
-export {OrientationProvider,OrientationContext,useOrientation} from './useOrientation'
+export {
+  OrientationProvider,
+  OrientationContext,
+  useOrientation,
+} from './useOrientation';
+export {TDataProvider, TDataContext, useTData} from './useTransportData';
+export {useFirestore} from './useFireStore';

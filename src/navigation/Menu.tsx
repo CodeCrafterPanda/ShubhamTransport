@@ -1,17 +1,17 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Alert, Animated, Linking, StyleSheet, View} from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, StyleSheet } from 'react-native';
 
 import {
-  useDrawerStatus,
-  createDrawerNavigator,
   DrawerContentComponentProps,
   DrawerContentScrollView,
+  createDrawerNavigator,
+  useDrawerStatus,
 } from '@react-navigation/drawer';
 
-import Screens from './Screens';
-import {Block, Text, Switch, Button, Image} from '../components';
-import {useData, useTheme, useTranslation} from '../hooks';
 import auth from '@react-native-firebase/auth';
+import { Block, Button, Image, Text } from '../components';
+import { useData, useTheme, useTranslation } from '../hooks';
+import Screens from './Screens';
 
 const Drawer = createDrawerNavigator();
 /* drawer menu screens navigation */
@@ -76,23 +76,9 @@ const DrawerContent = (props: DrawerContentComponentProps<any>) => {
     },
     [navigation, setActive],
   );
-
-  const handleWebLink = useCallback(url => Linking.openURL(url), []);
-
-  const isDrawerOpen = useDrawerStatus() === 'open';
-
   // screen list for Drawer menu
   const screens = [
     {name: t('screens.home'), to: 'Home', icon: assets.home},
-    {name: t('screens.users'), to: 'Users', icon: assets.components},
-    {name: t('screens.trucks'), to: 'Trucks', icon: assets.document},
-    {name: t('screens.trips'), to: 'Trips', icon: assets.profile},
-    {name: t('screens.payments'), to: 'Payments', icon: assets.rental},
-    {name: t('screens.expenses'), to: 'Expenses', icon: assets.profile},
-    {name: t('screens.savings'), to: 'Savings', icon: assets.settings},
-    {name: t('screens.drivers'), to: 'Drivers', icon: assets.register},
-    {name: t('screens.customers'), to: 'Customers', icon: assets.register},
-    // {name: t('screens.extra'), to: 'Pro', icon: assets.extras},
   ];
 
   return (

@@ -120,23 +120,23 @@ export function modifyTransactions(transactions) {
   });
 }
 
-export function getSummary(transactions) {
-  let netBalance = 0;
+export function getSummary(transactions,prevNetBalance) {
+  let netBalance =prevNetBalance|| 0;
   let totalIn = 0;
   let totalOut = 0;
-console.log(transactions)
   // Start from the end of the array
   for (let i = transactions.length - 1; i >= 0; i--) {
     let transaction = transactions[i];
 
-    if (transaction.type === 'CashIn') {
-      netBalance += transaction.amount;
-      totalIn += transaction.amount;
-    } else if (transaction.type === 'CashOut') {
-      netBalance -= transaction.amount;
-      totalOut += transaction.amount;
+    if (transaction.paymentMode !== 'Pending') {
+      if (transaction.type === 'CashIn') {
+        netBalance += transaction.amount;
+        totalIn += transaction.amount;
+      } else if (transaction.type === 'CashOut') {
+        netBalance -= transaction.amount;
+        totalOut += transaction.amount;
+      }
     }
-
     // Modify the transaction's balance
     transaction.balance = netBalance;
   }
@@ -146,22 +146,23 @@ console.log(transactions)
     num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
   return {
-    netBalance: formatNumber(netBalance),
-    totalIn: formatNumber(totalIn),
-    totalOut: formatNumber(totalOut),
+    netBalance,
+    totalIn,
+    totalOut,
   };
 }
 export const modifiedTransactions = modifyTransactions([]);
 export function getCurrentTimeAndDate() {
   const now = new Date();
-  const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+  const options = {hour: '2-digit', minute: '2-digit', hour12: true};
   const time = now.toLocaleTimeString('en-US', options);
-  
-  const dateOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+
+  const dateOptions = {day: '2-digit', month: 'short', year: 'numeric'};
   const date = now.toLocaleDateString('en-GB', dateOptions);
-  
+
   return {
     time: time,
     date: date.replace(/ /g, '-'), // Replace spaces with dashes
   };
 }
+

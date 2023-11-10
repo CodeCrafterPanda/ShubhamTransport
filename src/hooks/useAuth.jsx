@@ -6,24 +6,24 @@ import React, {
   useContext,
 } from 'react';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
+const usersCollection = firestore().collection('Users');
 
 const AuthContext = createContext();
 
-
-
 const AuthProvider = ({children}) => {
-    // Set an initializing state whilst Firebase connects
+  // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
+  const [dbUser, setDbUser] = useState();
 
   // Handle user state changes
   function onAuthStateChanged(user) {
-    console.log('User:',user)
     setUser(user);
-    setTimeout(()=>{
+    setTimeout(() => {
       if (initializing) setInitializing(false);
-    },1000)
+    }, 1000);
   }
 
   useEffect(() => {
@@ -31,15 +31,51 @@ const AuthProvider = ({children}) => {
     return subscriber; // unsubscribe on unmount
   }, []);
 
+  useEffect(() => {
+    let listener = () => {};
+    if (user) {
+      const {uid, email} = user;
+      const userRef = firestore().collection('Users').doc(uid);
+
+      const fetchAndCreateUser = async () => {
+        try {
+          const fetchedUser = await userRef.get();
+          if (!fetchedUser.exists) {
+            await userRef.set({
+              email,
+              isActive: false,
+              name: '',
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+            });
+            console.log('User added!');
+          }
+        } catch (error) {
+          console.error(
+            'An error occurred while fetching or creating the user:',
+            error,
+          );
+        }
+      };
+
+      fetchAndCreateUser();
+      listener = userRef.onSnapshot(documentSnapshot => {
+        if (documentSnapshot.data()) {
+          setDbUser({id: uid, ...documentSnapshot.data()});
+        }
+      });
+    }
+    return listener;
+  }, [user]);
+
   return (
-    <AuthContext.Provider value={{initializing, user}}>
+    <AuthContext.Provider value={{initializing, user, dbUser}}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export {AuthContext, AuthProvider};
-
 
 // Custom hook to use the AuthContext
 export function useAuth() {

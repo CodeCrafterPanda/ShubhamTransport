@@ -1,26 +1,8 @@
-export {default as Customers} from './Customers';
-export {default as Users} from './Users';
-export {default as Trucks} from './Trucks';
-export {default as Trips} from './TripsCopy';
-export {default as Payments} from './Payments';
-export {default as Expenses} from './Expenses';
-export {default as Savings} from './Savings';
-export {default as Drivers} from './Drivers';
-export {default as Components} from './Components';
-export {default as Extras} from './PlayGround';
+
 export {default as Home} from './Transactions';
-// export {default as Notifications} from './PlayGround';
-// export {default as NotificationsSettings} from './PlayGround';
-// export {default as Privacy} from './PlayGround';
 export {default as Profile} from './Profile';
 export {default as Register} from './Register';
 export {default as Login} from './Login';
 export {default as Splash} from './SplashScreen';
-// export {default as Login} from './PlayGround';
-// export {default as Rental} from './PlayGround';
-// export {default as Rentals} from './PlayGround';
-// export {default as Booking} from './PlayGround';
-// export {default as Settings} from './PlayGround';
-// export {default as Shopping} from './PlayGround';
-// export {default as Pro} from './PlayGround';
-// export {default as PlayGround} from './PlayGround';
+export {default as AccessDenied} from './AccessDenied'
+
